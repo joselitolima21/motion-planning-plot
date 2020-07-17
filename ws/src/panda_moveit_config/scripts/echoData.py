@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import rospy
 from sensor_msgs.msg import JointState
-
+# dale
 def callback(data):
     rospy.loginfo(data.position)
     rospy.loginfo(data.velocity)
