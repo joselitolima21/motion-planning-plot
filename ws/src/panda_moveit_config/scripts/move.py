@@ -9,6 +9,10 @@ from math import pi
 from std_msgs.msg import String
 from moveit_commander.conversions import pose_to_list
 
+# Imports para o subscriber
+import rospy
+from sensor_msgs.msg import JointState
+
 def all_close(goal, actual, tolerance):
   
   all_equal = True
@@ -43,33 +47,14 @@ class MoveGroupPythonIntefaceTutorial(object):
                                                    moveit_msgs.msg.DisplayTrajectory,
                                                    queue_size=20)
 
-    planning_frame = group.get_planning_frame()
-    print "============ Reference frame: %s" % planning_frame
-
-    # We can also print the name of the end-effector link for this group:
-    eef_link = group.get_end_effector_link()
-    print "============ End effector: %s" % eef_link
-
-    # We can get a list of all the groups in the robot:
-    group_names = robot.get_group_names()
-    print "============ Robot Groups:", robot.get_group_names()
-
-    # Sometimes for debugging it is useful to print the entire state of the
-    # robot:
-    print "============ Printing robot state"
-    print robot.get_current_state()
-    print ""
-    ## END_SUB_TUTORIAL
-
-    # Misc variables
     self.box_name = ''
     self.robot = robot
     self.scene = scene
     self.group = group
     self.display_trajectory_publisher = display_trajectory_publisher
-    self.planning_frame = planning_frame
-    self.eef_link = eef_link
-    self.group_names = group_names
+    # self.planning_frame = planning_frame
+    # self.eef_link = eef_link
+    # self.group_names = group_names
 
   def go_to_joint_state(self):
     group = self.group
@@ -112,7 +97,7 @@ class MoveGroupPythonIntefaceTutorial(object):
     pose_goal.position.z = 0.4
     group.set_pose_target(pose_goal)
 
-    plan = group.go(wait=True)
+    plan = group.go(wait=False)
 
     group.stop()
     group.clear_pose_targets()
@@ -120,12 +105,27 @@ class MoveGroupPythonIntefaceTutorial(object):
     current_pose = self.group.get_current_pose().pose
     return all_close(pose_goal, current_pose, 0.01)
 
+  # Funcoes para o subscriber
+  def callback(self,data):
+    rospy.loginfo(data.position)
+    rospy.loginfo(data.velocity)
+    
+  def listener(self):
+    rospy.Subscriber("/joint_states", JointState, self.callback)
+    rospy.spin()
 
+
+# Funcao principal
 def main():
   try:
-    print "============ Iniciando o programa ============"
+    print "=============== Iniciando o programa ================"
     tutorial = MoveGroupPythonIntefaceTutorial()
+
+    print "== Comecando a executar o movimento e ler os dados =="
     tutorial.go_to_joint_state()
+    # tutorial.listener()
+    print "============== Finalizando o programa ==============="
+    sys.exit(0)
   except rospy.ROSInterruptException:
     return
   except KeyboardInterrupt:
@@ -133,39 +133,3 @@ def main():
 
 if __name__ == '__main__':
   main()
-
-## BEGIN_TUTORIAL
-## .. _moveit_commander:
-##    http://docs.ros.org/kinetic/api/moveit_commander/html/namespacemoveit__commander.html
-##
-## .. _MoveGroupCommander:
-##    http://docs.ros.org/kinetic/api/moveit_commander/html/classmoveit__commander_1_1move__group_1_1MoveGroupCommander.html
-##
-## .. _RobotCommander:
-##    http://docs.ros.org/kinetic/api/moveit_commander/html/classmoveit__commander_1_1robot_1_1RobotCommander.html
-##
-## .. _PlanningSceneInterface:
-##    http://docs.ros.org/kinetic/api/moveit_commander/html/classmoveit__commander_1_1planning__scene__interface_1_1PlanningSceneInterface.html
-##
-## .. _DisplayTrajectory:
-##    http://docs.ros.org/kinetic/api/moveit_msgs/html/msg/DisplayTrajectory.html
-##
-## .. _RobotTrajectory:
-##    http://docs.ros.org/kinetic/api/moveit_msgs/html/msg/RobotTrajectory.html
-##
-## .. _rospy:
-##    http://docs.ros.org/kinetic/api/rospy/html/
-## CALL_SUB_TUTORIAL imports
-## CALL_SUB_TUTORIAL setup
-## CALL_SUB_TUTORIAL basic_info
-## CALL_SUB_TUTORIAL plan_to_joint_state
-## CALL_SUB_TUTORIAL plan_to_pose
-## CALL_SUB_TUTORIAL plan_cartesian_path
-## CALL_SUB_TUTORIAL display_trajectory
-## CALL_SUB_TUTORIAL execute_plan
-## CALL_SUB_TUTORIAL add_box
-## CALL_SUB_TUTORIAL wait_for_scene_update
-## CALL_SUB_TUTORIAL attach_object
-## CALL_SUB_TUTORIAL detach_object
-## CALL_SUB_TUTORIAL remove_object
-## END_TUTORIAL
