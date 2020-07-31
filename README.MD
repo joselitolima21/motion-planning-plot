@@ -44,3 +44,4 @@ if __name__ == '__main__':
 ```
 roslaunch panda_moveit_config demo.launch
 ```
+https://www.learnpyqt.com/courses/concurrent-execution/multithreading-pyqt-applications-qthreadpool/

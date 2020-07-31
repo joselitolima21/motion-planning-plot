@@ -5,7 +5,7 @@
 # Created by: PyQt4 UI code generator 4.11.4
 #
 # WARNING! All changes made in this file will be lost!
-import sys
+import os,sys
 from PyQt4 import QtCore, QtGui
 
 try:
@@ -38,6 +38,7 @@ class Ui_MainWindow(object):
         self.pushButton_4 = QtGui.QPushButton(self.tela1)
         self.pushButton_4.setGeometry(QtCore.QRect(310, 370, 111, 41))
         self.pushButton_4.setObjectName(_fromUtf8("pushButton_4"))
+        self.pushButton_4.clicked.connect(self.executeLaunch)
         self.tabWidget.addTab(self.tela1, _fromUtf8(""))
         self.tela2 = QtGui.QWidget()
         self.tela2.setObjectName(_fromUtf8("tela2"))
@@ -197,7 +198,7 @@ class Ui_MainWindow(object):
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow", None))
+        MainWindow.setWindowTitle(_translate("MainWindow", "Motion Planning Plot", None))
         self.tela1.setToolTip(_translate("MainWindow", "<html><head/><body><p><br/></p><p><br/></p></body></html>", None))
         self.pushButton_4.setText(_translate("MainWindow", "Executar", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tela1), _translate("MainWindow", "Conexão", None))
@@ -217,6 +218,12 @@ class Ui_MainWindow(object):
         self.pushButton.setText(_translate("MainWindow", "Executar", None))
         self.tabWidget_2.setTabText(self.tabWidget_2.indexOf(self.tab_2), _translate("MainWindow", "Juntas", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tela2), _translate("MainWindow", "Planejamento de movimento", None))
+
+    def executeLaunch(self):
+       import subprocess 
+       return_code = subprocess.call('roslaunch panda_moveit_config demo.launch', shell=True)
+
+
 
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
