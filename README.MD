@@ -27,4 +27,20 @@ cd ./src
 sudo rosdep init
 rosdep update
 rosdep install -y --from-paths . --ignore-src --rosdistro kinetic
+``` 
+# Transformar para python
+```
+pyuic4 ./programa/untitled.ui -o ./programa/index.py
+```
+```
+if __name__ == '__main__':
+    app = QtGui.QApplication(sys.argv)
+    window =  QtGui.QMainWindow()
+    classe = Ui_MainWindow()
+    classe.setupUi(window)
+    window.show()
+    sys.exit(app.exec_())
+```
+```
+roslaunch panda_moveit_config demo.launch
 ```

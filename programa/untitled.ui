@@ -36,7 +36,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tela1">
      <property name="toolTip">
@@ -45,6 +45,19 @@
      <attribute name="title">
       <string>Conexão</string>
      </attribute>
+     <widget class="QPushButton" name="pushButton_4">
+      <property name="geometry">
+       <rect>
+        <x>310</x>
+        <y>370</y>
+        <width>111</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Executar</string>
+      </property>
+     </widget>
     </widget>
     <widget class="QWidget" name="tela2">
      <attribute name="title">

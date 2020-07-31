@@ -8,6 +8,7 @@ import geometry_msgs.msg
 from math import pi
 from std_msgs.msg import String
 from moveit_commander.conversions import pose_to_list
+import threading
 
 # Imports para o subscriber
 import rospy
@@ -68,9 +69,9 @@ class MoveGroupPythonIntefaceTutorial(object):
     joint_goal[5] = 3.1932
     joint_goal[6] = 1.8148
 
-    group.go(joint_goal, wait=True)
+    group.go(joint_goal, wait=False)
     
-    joint_home = group.get_current_joint_values()
+    """ joint_home = group.get_current_joint_values()
     joint_home[0] = 0
     joint_home[1] = -0.0194
     joint_home[2] = -0.2547
@@ -79,7 +80,7 @@ class MoveGroupPythonIntefaceTutorial(object):
     joint_home[5] = 3.5246
     joint_home[6] = -0.0318
 
-    group.go(joint_home, wait=True)
+    group.go(joint_home, wait=True) """
     
     group.stop()
 
@@ -120,12 +121,10 @@ def main():
   try:
     print "=============== Iniciando o programa ================"
     tutorial = MoveGroupPythonIntefaceTutorial()
-
     print "== Comecando a executar o movimento e ler os dados =="
-    tutorial.go_to_joint_state()
-    # tutorial.listener()
+    threading.Thread(target=tutorial.go_to_joint_state).start()
+    threading.Thread(target=tutorial.listener).start()
     print "============== Finalizando o programa ==============="
-    sys.exit(0)
   except rospy.ROSInterruptException:
     return
   except KeyboardInterrupt:
