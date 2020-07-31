@@ -15,7 +15,8 @@ catkin_make
 ```
 ## 5 - Dar source no workspace
 ```
-source ./devel/setup.bash
+echo "source ./devel/setup.bash" >> ~/.bashrc
+source ~/.bashrc
 ```
 ## 6 - Instalar o joint-state-publisher
 ```
