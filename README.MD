@@ -1,7 +1,7 @@
 # Passos
 ## 1 - Instalar o ros-kinetic: http://wiki.ros.org/kinetic/Installation/Ubuntu
 ## 2 - Instalar MoveIt 
-```
+
 sudo apt install ros-kinetic-moveit
 ```
 ## 3 - Clonar o repositório do github
@@ -34,6 +34,32 @@ rosdep install -y --from-paths . --ignore-src --rosdistro kinetic
 pyuic4 ./programa/untitled.ui -o ./programa/index.py
 ```
 ```
+import sys
+import subprocess
+
+self.pushButton_4.clicked.connect(self.executeLaunch)
+self.pushButton_5.clicked.connect(self.killLaunch)
+def executeLaunch(self):
+        self.thread = My_Thread(self.label)
+        self.thread.start()
+    
+    def killLaunch(self):
+        subprocess.call('kill -INT `cat /tmp/demo.pid`',shell =True)
+        self.label.setText('O RViz foi finalizado com sucesso!')
+
+
+class My_Thread(QtCore.QThread):
+
+    def __init__(self,label):
+        self.label = label
+        super(My_Thread,self).__init__(label)
+
+    def run(self):
+        self.label.setText('O RViz foi inicializado com sucesso! \nAguarde alguns segundos para aparecer')
+        return_code = subprocess.call('roslaunch --pid=/tmp/demo.pid panda_moveit_config demo.launch',shell=True)
+
+
+
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
     window =  QtGui.QMainWindow()
@@ -46,3 +72,6 @@ if __name__ == '__main__':
 roslaunch panda_moveit_config demo.launch
 ```
 https://www.learnpyqt.com/courses/concurrent-execution/multithreading-pyqt-applications-qthreadpool/
+
+# Concertar
+1 - impedir de abrir vários

@@ -5,7 +5,8 @@
 # Created by: PyQt4 UI code generator 4.11.4
 #
 # WARNING! All changes made in this file will be lost!
-import os,sys
+import sys
+import subprocess
 from PyQt4 import QtCore, QtGui
 
 try:
@@ -36,9 +37,64 @@ class Ui_MainWindow(object):
         self.tela1 = QtGui.QWidget()
         self.tela1.setObjectName(_fromUtf8("tela1"))
         self.pushButton_4 = QtGui.QPushButton(self.tela1)
-        self.pushButton_4.setGeometry(QtCore.QRect(310, 370, 111, 41))
+        self.pushButton_4.setGeometry(QtCore.QRect(250, 370, 111, 41))
+        self.pushButton_4.setStyleSheet(_fromUtf8("box-shadow: 0 1px 0 #f0c14b;\n"
+"border:  1px solid #a88734 #9c7e31 #846a29;;\n"
+"border-radius: 3px;\n"
+"background-color: qlineargradient(spread:pad, x1:0.514, y1:0, x2:0.514, y2:1, stop:0 #f7dfa5, stop:1 #f0c14b);"))
         self.pushButton_4.setObjectName(_fromUtf8("pushButton_4"))
         self.pushButton_4.clicked.connect(self.executeLaunch)
+        self.pushButton_5 = QtGui.QPushButton(self.tela1)
+        self.pushButton_5.setGeometry(QtCore.QRect(390, 370, 111, 41))
+        self.pushButton_5.setStyleSheet(_fromUtf8("box-shadow: 0 1px 0 rgba(255,255,255,.6);\n"
+"border:  1px solid #adb1b8 #a2a6ac #8d9096;\n"
+"border-radius: 3px;\n"
+"background-color: qlineargradient(spread:pad, x1:0.514, y1:0, x2:0.514, y2:1, stop:0 #f7f8fa, stop:1 #e7e9ec);"))
+        self.pushButton_5.setObjectName(_fromUtf8("pushButton_5"))
+        self.pushButton_5.clicked.connect(self.killLaunch)
+        self.Monitor = QtGui.QFrame(self.tela1)
+        self.Monitor.setGeometry(QtCore.QRect(30, 180, 681, 121))
+        self.Monitor.setFrameShape(QtGui.QFrame.StyledPanel)
+        self.Monitor.setFrameShadow(QtGui.QFrame.Raised)
+        self.Monitor.setObjectName(_fromUtf8("Monitor"))
+        self.label = QtGui.QLabel(self.Monitor)
+        self.label.setGeometry(QtCore.QRect(20, 20, 311, 71))
+        self.label.setText(_fromUtf8(""))
+        self.label.setObjectName(_fromUtf8("label"))
+        self.label_2 = QtGui.QLabel(self.tela1)
+        self.label_2.setGeometry(QtCore.QRect(70, 30, 471, 31))
+        font = QtGui.QFont()
+        font.setPointSize(16)
+        font.setBold(True)
+        font.setWeight(75)
+        self.label_2.setFont(font)
+        self.label_2.setObjectName(_fromUtf8("label_2"))
+        self.label_3 = QtGui.QLabel(self.tela1)
+        self.label_3.setGeometry(QtCore.QRect(70, 60, 441, 41))
+        font = QtGui.QFont()
+        font.setPointSize(16)
+        font.setBold(True)
+        font.setWeight(75)
+        self.label_3.setFont(font)
+        self.label_3.setObjectName(_fromUtf8("label_3"))
+        self.label_4 = QtGui.QLabel(self.tela1)
+        self.label_4.setGeometry(QtCore.QRect(70, 110, 611, 31))
+        font = QtGui.QFont()
+        font.setPointSize(16)
+        font.setBold(True)
+        font.setWeight(75)
+        self.label_4.setFont(font)
+        self.label_4.setObjectName(_fromUtf8("label_4"))
+        self.widget = QtGui.QWidget(self.tela1)
+        self.widget.setGeometry(QtCore.QRect(40, 40, 16, 16))
+        self.widget.setStyleSheet(_fromUtf8("background-color: rgb(44, 44, 44);\n"
+"border-radius: 8px;"))
+        self.widget.setObjectName(_fromUtf8("widget"))
+        self.widget_2 = QtGui.QWidget(self.tela1)
+        self.widget_2.setGeometry(QtCore.QRect(40, 120, 16, 16))
+        self.widget_2.setStyleSheet(_fromUtf8("background-color: rgb(44, 44, 44);\n"
+"border-radius: 8px;"))
+        self.widget_2.setObjectName(_fromUtf8("widget_2"))
         self.tabWidget.addTab(self.tela1, _fromUtf8(""))
         self.tela2 = QtGui.QWidget()
         self.tela2.setObjectName(_fromUtf8("tela2"))
@@ -200,7 +256,11 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(_translate("MainWindow", "Motion Planning Plot", None))
         self.tela1.setToolTip(_translate("MainWindow", "<html><head/><body><p><br/></p><p><br/></p></body></html>", None))
-        self.pushButton_4.setText(_translate("MainWindow", "Executar", None))
+        self.pushButton_4.setText(_translate("MainWindow", "Iniciar RViz", None))
+        self.pushButton_5.setText(_translate("MainWindow", "Encerrar RViz", None))
+        self.label_2.setText(_translate("MainWindow", "Nesta aba pode-se iniciar ou encerrrar o RViz,", None))
+        self.label_3.setText(_translate("MainWindow", "que está configurado com o robô Panda", None))
+        self.label_4.setText(_translate("MainWindow", "E então será possivel exeutar o planejamento de movimento", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tela1), _translate("MainWindow", "Conexão", None))
         self.label_18.setText(_translate("MainWindow", "Valor de X", None))
         self.label_12.setText(_translate("MainWindow", "Valor de Y", None))
@@ -220,8 +280,23 @@ class Ui_MainWindow(object):
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tela2), _translate("MainWindow", "Planejamento de movimento", None))
 
     def executeLaunch(self):
-       import subprocess 
-       return_code = subprocess.call('roslaunch panda_moveit_config demo.launch', shell=True)
+        self.thread = My_Thread(self.label)
+        self.thread.start()
+    
+    def killLaunch(self):
+        subprocess.call('kill -INT `cat /tmp/demo.pid`',shell =True)
+        self.label.setText('O RViz foi finalizado com sucesso!')
+
+
+class My_Thread(QtCore.QThread):
+
+    def __init__(self,label):
+        self.label = label
+        super(My_Thread,self).__init__(label)
+
+    def run(self):
+        self.label.setText('O RViz foi inicializado com sucesso! \nAguarde alguns segundos para ele aparecer')
+        return_code = subprocess.call('roslaunch --pid=/tmp/demo.pid panda_moveit_config demo.launch',shell=True)
 
 
 
