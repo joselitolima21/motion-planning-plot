@@ -1,13 +1,11 @@
 # Passos
 ## 1 - Instalar o ros-kinetic: http://wiki.ros.org/kinetic/Installation/Ubuntu
 ## 2 - Instalar MoveIt 
-
+```
 sudo apt install ros-kinetic-moveit
 ```
 ## 3 - Clonar o repositório do github
-```
 https://github.com/joselitolima21/motion-planning-plot
-```
 ## 4 - Dar make no workspace
 ```
 cd ./motion-planning-plot/ws
