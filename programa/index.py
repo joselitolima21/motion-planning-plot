@@ -156,6 +156,7 @@ class Ui_MainWindow(object):
         self.pushButton_2 = QtGui.QPushButton(self.tab)
         self.pushButton_2.setGeometry(QtCore.QRect(80, 400, 111, 41))
         self.pushButton_2.setObjectName(_fromUtf8("pushButton_2"))
+        self.pushButton_2.clicked.connect(self.moveTheRobot)
         self.tabWidget_2.addTab(self.tab, _fromUtf8(""))
         self.tab_2 = QtGui.QWidget()
         self.tab_2.setObjectName(_fromUtf8("tab_2"))
@@ -280,24 +281,35 @@ class Ui_MainWindow(object):
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tela2), _translate("MainWindow", "Planejamento de movimento", None))
 
     def executeLaunch(self):
-        self.thread = My_Thread(self.label)
-        self.thread.start()
+        self.threadRviz = rvizThread(self.label)
+        self.threadRviz.start()
     
     def killLaunch(self):
         subprocess.call('kill -INT `cat /tmp/demo.pid`',shell =True)
         self.label.setText('O RViz foi finalizado com sucesso!')
 
+    def moveTheRobot(self):
+        self.threadMove = moveThread()
+        self.threadMove.start()
 
-class My_Thread(QtCore.QThread):
+class rvizThread(QtCore.QThread):
 
     def __init__(self,label):
         self.label = label
-        super(My_Thread,self).__init__(label)
+        super(rvizThread,self).__init__(label)
 
     def run(self):
         self.label.setText('O RViz foi inicializado com sucesso! \nAguarde alguns segundos para ele aparecer')
         return_code = subprocess.call('roslaunch --pid=/tmp/demo.pid panda_moveit_config demo.launch',shell=True)
 
+class moveThread(QtCore.QThread):
+
+    """def __init__(self,label):
+        self.label = label
+        super(rvizThread,self).__init__(label)"""
+
+    def run(self):
+        return_code = subprocess.call('rosrun panda_moveit_config move.py',shell=True)
 
 
 if __name__ == '__main__':

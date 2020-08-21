@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 import sys
+import subprocess
+import os
 import copy
 import rospy
 import moveit_commander
@@ -53,6 +55,7 @@ class MoveGroupPythonIntefaceTutorial(object):
     self.scene = scene
     self.group = group
     self.display_trajectory_publisher = display_trajectory_publisher
+    self.dataList = [0]
     # self.planning_frame = planning_frame
     # self.eef_link = eef_link
     # self.group_names = group_names
@@ -107,9 +110,15 @@ class MoveGroupPythonIntefaceTutorial(object):
     return all_close(pose_goal, current_pose, 0.01)
 
   # Funcoes para o subscriber
+  
   def callback(self,data):
-    rospy.loginfo(data.position)
-    rospy.loginfo(data.velocity)
+    if self.dataList[-1] == data.position:
+      print(self.dataList)
+      rospy.signal_shutdown('Finalizando')
+    else:
+      self.dataList.append(data.position)
+      #rospy.loginfo(data.velocity)
+    
     
   def listener(self):
     rospy.Subscriber("/joint_states", JointState, self.callback)
