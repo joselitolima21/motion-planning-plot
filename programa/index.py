@@ -6,7 +6,15 @@
 #
 # WARNING! All changes made in this file will be lost!
 import sys
+import re
+import random
 import subprocess
+# Essas
+import matplotlib
+matplotlib.use('Qt4Agg')
+from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg, NavigationToolbar2QT as NavigationToolbar
+from matplotlib.figure import Figure
+# -----
 from PyQt4 import QtCore, QtGui
 
 try:
@@ -22,6 +30,13 @@ try:
 except AttributeError:
     def _translate(context, text, disambig):
         return QtGui.QApplication.translate(context, text, disambig)
+
+class MplCanvas(FigureCanvasQTAgg):
+
+    def __init__(self, parent=None, width=5, height=4, dpi=100):
+        fig = Figure(figsize=(width, height), dpi=dpi)
+        self.axes = fig.add_subplot(111)
+        super(MplCanvas, self).__init__(fig)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -103,6 +118,29 @@ class Ui_MainWindow(object):
         self.frame_2.setFrameShape(QtGui.QFrame.StyledPanel)
         self.frame_2.setFrameShadow(QtGui.QFrame.Raised)
         self.frame_2.setObjectName(_fromUtf8("frame_2"))
+
+        # Para adicionar o gráfico
+        self.mapLayout = QtGui.QVBoxLayout(self.frame_2)
+        self.sc = MplCanvas(self, width=4.61, height=5.11, dpi=100)
+        self.mapToolbar = NavigationToolbar(self.sc,self.frame_2)
+        self.mapLayout.addWidget(self.mapToolbar)
+        self.mapLayout.addWidget(self.sc)
+
+        # Adicionando os dados
+        self.data = []
+        print(self.data)
+        self.sc.xdata = []
+        self.sc.ydata = []
+        self._plot_ref = None
+        self.updatePlot()
+        self.sc.show()
+        # Setup a timer to trigger the redraw by calling updatePlot.
+        self.timer = QtCore.QTimer()
+        self.timer.setInterval(100)
+        self.timer.timeout.connect(self.updatePlot)
+        self.timer.start()
+
+
         self.tabWidget_2 = QtGui.QTabWidget(self.tela2)
         self.tabWidget_2.setGeometry(QtCore.QRect(10, 10, 291, 511))
         self.tabWidget_2.setObjectName(_fromUtf8("tabWidget_2"))
@@ -289,8 +327,21 @@ class Ui_MainWindow(object):
         self.label.setText('O RViz foi finalizado com sucesso!')
 
     def moveTheRobot(self):
-        self.threadMove = moveThread()
+        self.threadMove = moveThread(self.data)
         self.threadMove.start()
+
+    def updatePlot(self):
+        self.sc.xdata = self.sc.xdata + [random.randint(0, 10)]
+        self.sc.ydata = self.sc.ydata + [random.randint(0, 10)]
+     
+        if self._plot_ref is None:
+            plot_refs = self.sc.axes.plot(self.sc.xdata, self.sc.ydata, 'r')
+            self._plot_ref = plot_refs[0]
+        else:
+            self._plot_ref.set_ydata(self.sc.ydata)
+            self._plot_ref.set_xdata(self.sc.xdata)
+            
+        self.sc.draw()
 
 class rvizThread(QtCore.QThread):
 
@@ -304,12 +355,29 @@ class rvizThread(QtCore.QThread):
 
 class moveThread(QtCore.QThread):
 
-    """def __init__(self,label):
-        self.label = label
-        super(rvizThread,self).__init__(label)"""
+    def __init__(self,data):
+        self.data = data
+        super(moveThread,self).__init__()
 
     def run(self):
-        return_code = subprocess.call('rosrun panda_moveit_config move.py',shell=True)
+        cmd = 'rosrun panda_moveit_config move.py' 
+
+        #return_code = subprocess.call(cmd,shell=True)
+        #return_code = subprocess.Popen(cmd, shell=True, stderr=subprocess.PIPE)
+
+        def printResult(command):
+            process = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True)
+            while True:
+                line = process.stdout.readline().rstrip()
+                if not line:
+                    break
+                if not re.compile('\(').match(line):
+                    pass
+                yield line
+
+        for path in printResult(cmd):
+            self.data.append(path)
+            print(self.data)
 
 
 if __name__ == '__main__':

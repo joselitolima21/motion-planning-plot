@@ -113,12 +113,11 @@ class MoveGroupPythonIntefaceTutorial(object):
   
   def callback(self,data):
     if self.dataList[-1] == data.position:
-      print(self.dataList)
+      #print(self.dataList)
       rospy.signal_shutdown('Finalizando')
     else:
+      print(data.position)
       self.dataList.append(data.position)
-      #rospy.loginfo(data.velocity)
-    
     
   def listener(self):
     rospy.Subscriber("/joint_states", JointState, self.callback)
@@ -128,12 +127,9 @@ class MoveGroupPythonIntefaceTutorial(object):
 # Funcao principal
 def main():
   try:
-    print "=============== Iniciando o programa ================"
     tutorial = MoveGroupPythonIntefaceTutorial()
-    print "== Comecando a executar o movimento e ler os dados =="
     threading.Thread(target=tutorial.go_to_joint_state).start()
     threading.Thread(target=tutorial.listener).start()
-    print "============== Finalizando o programa ==============="
   except rospy.ROSInterruptException:
     return
   except KeyboardInterrupt:
