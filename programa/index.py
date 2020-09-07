@@ -128,18 +128,22 @@ class Ui_MainWindow(object):
 
         # Adicionando os dados
         self.data = []
-        print(self.data)
         self.sc.xdata = []
         self.sc.ydata = []
+        self.sc.ydata1 = []
+        self.sc.ydata2 = []
+        self.sc.ydata3 = []
+        self.sc.ydata4 = []
+        self.sc.ydata5 = []
+        self.sc.ydata6 = []
         self._plot_ref = None
-        self.updatePlot()
+        self._plot_ref1 = None
+        self._plot_ref2 = None
+        self._plot_ref3 = None
+        self._plot_ref4 = None
+        self._plot_ref5 = None
+        self._plot_ref6 = None
         self.sc.show()
-        # Setup a timer to trigger the redraw by calling updatePlot.
-        self.timer = QtCore.QTimer()
-        self.timer.setInterval(100)
-        self.timer.timeout.connect(self.updatePlot)
-        self.timer.start()
-
 
         self.tabWidget_2 = QtGui.QTabWidget(self.tela2)
         self.tabWidget_2.setGeometry(QtCore.QRect(10, 10, 291, 511))
@@ -324,24 +328,13 @@ class Ui_MainWindow(object):
     
     def killLaunch(self):
         subprocess.call('kill -INT `cat /tmp/demo.pid`',shell =True)
+        subprocess.call('killall -9 roslaunch',shell =True)
         self.label.setText('O RViz foi finalizado com sucesso!')
 
     def moveTheRobot(self):
-        self.threadMove = moveThread(self.data)
+        self.threadMove = moveThread(self)
         self.threadMove.start()
-
-    def updatePlot(self):
-        self.sc.xdata = self.sc.xdata + [random.randint(0, 10)]
-        self.sc.ydata = self.sc.ydata + [random.randint(0, 10)]
-     
-        if self._plot_ref is None:
-            plot_refs = self.sc.axes.plot(self.sc.xdata, self.sc.ydata, 'r')
-            self._plot_ref = plot_refs[0]
-        else:
-            self._plot_ref.set_ydata(self.sc.ydata)
-            self._plot_ref.set_xdata(self.sc.xdata)
-            
-        self.sc.draw()
+        
 
 class rvizThread(QtCore.QThread):
 
@@ -355,8 +348,8 @@ class rvizThread(QtCore.QThread):
 
 class moveThread(QtCore.QThread):
 
-    def __init__(self,data):
-        self.data = data
+    def __init__(self,ref):
+        self.ref = ref
         super(moveThread,self).__init__()
 
     def run(self):
@@ -374,10 +367,79 @@ class moveThread(QtCore.QThread):
                 if not re.compile('\(').match(line):
                     pass
                 yield line
-
+        i = 0
         for path in printResult(cmd):
-            self.data.append(path)
-            print(self.data)
+            if (i > 2):
+                currentTuple = eval(path)
+                self.ref.data.append(currentTuple)
+            
+                self.ref.sc.xdata = self.ref.sc.xdata + [i-3]
+                self.ref.sc.ydata = self.ref.sc.ydata + [currentTuple[0]]
+                self.ref.sc.ydata1 = self.ref.sc.ydata1 + [currentTuple[1]]
+                self.ref.sc.ydata2 = self.ref.sc.ydata2 + [currentTuple[2]]
+                self.ref.sc.ydata3 = self.ref.sc.ydata3 + [currentTuple[3]]
+                self.ref.sc.ydata4 = self.ref.sc.ydata4 + [currentTuple[4]]
+                self.ref.sc.ydata5 = self.ref.sc.ydata5 + [currentTuple[5]]
+                self.ref.sc.ydata6 = self.ref.sc.ydata6 + [currentTuple[6]]
+            
+                if self.ref._plot_ref is None:
+                    plot_refs = self.ref.sc.axes.plot(self.ref.sc.xdata, self.ref.sc.ydata, 'r',label='Joint 1')
+                    plot_refs1 = self.ref.sc.axes.plot(self.ref.sc.xdata, self.ref.sc.ydata1, 'g',label='Joint 2')
+                    plot_refs2 = self.ref.sc.axes.plot(self.ref.sc.xdata, self.ref.sc.ydata2, 'b',label='Joint 3')
+                    plot_refs3 = self.ref.sc.axes.plot(self.ref.sc.xdata, self.ref.sc.ydata3, 'y',label='Joint 4')
+                    plot_refs4 = self.ref.sc.axes.plot(self.ref.sc.xdata, self.ref.sc.ydata4, 'k',label='Joint 5')
+                    plot_refs5 = self.ref.sc.axes.plot(self.ref.sc.xdata, self.ref.sc.ydata5, 'c',label='Joint 6')
+                    plot_refs6 = self.ref.sc.axes.plot(self.ref.sc.xdata, self.ref.sc.ydata6, 'm',label='Joint 7')
+                    self.ref._plot_ref = plot_refs[0]
+                    self.ref._plot_ref1 = plot_refs1[0]
+                    self.ref._plot_ref2 = plot_refs2[0]
+                    self.ref._plot_ref3 = plot_refs3[0]
+                    self.ref._plot_ref4 = plot_refs4[0]
+                    self.ref._plot_ref5 = plot_refs5[0]
+                    self.ref._plot_ref6 = plot_refs6[0]
+                    self.ref.sc.axes.legend(loc=2,fontsize='x-small')
+                else:
+                    self.ref._plot_ref.set_xdata(self.ref.sc.xdata)
+                    self.ref._plot_ref.set_ydata(self.ref.sc.ydata)
+
+                
+                    self.ref._plot_ref1.set_xdata(self.ref.sc.xdata)
+                    self.ref._plot_ref1.set_ydata(self.ref.sc.ydata1)
+                    self.ref._plot_ref2.set_xdata(self.ref.sc.xdata)
+                    self.ref._plot_ref2.set_ydata(self.ref.sc.ydata2)
+                    self.ref._plot_ref3.set_xdata(self.ref.sc.xdata)
+                    self.ref._plot_ref3.set_ydata(self.ref.sc.ydata3)
+                    self.ref._plot_ref4.set_xdata(self.ref.sc.xdata)
+                    self.ref._plot_ref4.set_ydata(self.ref.sc.ydata4)
+                    self.ref._plot_ref5.set_xdata(self.ref.sc.xdata)
+                    self.ref._plot_ref5.set_ydata(self.ref.sc.ydata5)
+                    self.ref._plot_ref6.set_xdata(self.ref.sc.xdata)
+                    self.ref._plot_ref6.set_ydata(self.ref.sc.ydata6)
+                    self.ref.sc.axes.legend(loc=2,fontsize='x-small')
+
+                maximosList = []    
+                maximosList.append(max(self.ref.sc.ydata))
+                maximosList.append(max(self.ref.sc.ydata1))
+                maximosList.append(max(self.ref.sc.ydata2))
+                maximosList.append(max(self.ref.sc.ydata3))
+                maximosList.append(max(self.ref.sc.ydata4))
+                maximosList.append(max(self.ref.sc.ydata5))
+                maximosList.append(max(self.ref.sc.ydata6))
+                
+                minumusList = []    
+                minumusList.append(min(self.ref.sc.ydata))
+                minumusList.append(min(self.ref.sc.ydata1))
+                minumusList.append(min(self.ref.sc.ydata2))
+                minumusList.append(min(self.ref.sc.ydata3))
+                minumusList.append(min(self.ref.sc.ydata4))
+                minumusList.append(min(self.ref.sc.ydata5))
+                minumusList.append(min(self.ref.sc.ydata6))
+
+                self.ref.sc.axes.set_xlim(-0.1,self.ref.sc.xdata[-1])
+                self.ref.sc.axes.set_ylim(min(minumusList),max(maximosList))
+
+                self.ref.sc.draw()
+            i = i + 1
 
 
 if __name__ == '__main__':
